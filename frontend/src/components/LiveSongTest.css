@@ -708,3 +708,32 @@
   border-radius: var(--radius-md);
   line-height: var(--line-height-relaxed);
 }
+
+/* File Input Custom Styling */
+.file-input-label {
+  display: inline-block;
+  cursor: pointer;
+  margin: var(--space-4) 0;
+}
+
+.file-input-label input[type="file"] {
+  display: none;
+}
+
+.file-input-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-6);
+  background: var(--gradient-primary);
+  color: white;
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-bold);
+  transition: all var(--duration-normal) var(--ease-smooth);
+  box-shadow: var(--shadow-glow-pink);
+}
+
+.file-input-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(255, 122, 182, 0.4);
+}
