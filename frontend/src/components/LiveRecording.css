@@ -1,0 +1,132 @@
+/* ===== LIVE RECORDING - SoundViral Premium ===== */
+
+.live-recording {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-4) 0;
+}
+
+.live-recording .page-header {
+  text-align: center;
+  margin-bottom: var(--space-10);
+}
+
+.live-recording .page-header h2 {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-3);
+}
+
+.live-recording .page-header p {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+}
+
+/* Recording Controls */
+.recording-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-10);
+  background: var(--color-bg-card);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  margin-bottom: var(--space-8);
+}
+
+/* Record Button */
+.record-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-primary);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: white;
+  transition: all var(--duration-normal) var(--ease-smooth);
+  box-shadow: var(--shadow-glow-pink);
+  position: relative;
+}
+
+.record-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 50px rgba(255, 122, 182, 0.4);
+}
+
+.record-btn:active {
+  transform: scale(0.95);
+}
+
+.record-btn.recording {
+  animation: recordPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes recordPulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(255, 122, 182, 0.3); }
+  50% { box-shadow: 0 0 60px rgba(255, 122, 182, 0.5), 0 0 100px rgba(255, 122, 182, 0.2); }
+}
+
+.recording-status {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.recording-time {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  font-family: var(--font-mono);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Visualizer */
+.visualizer-container {
+  width: 100%;
+  height: 120px;
+  background: var(--color-bg-glass);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.visualizer-container canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Result cards inherit from LiveSongTest styles */
+.recording-results {
+  animation: fadeSlideUp 0.5s var(--ease-out-expo) forwards;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .recording-controls {
+    padding: var(--space-6);
+  }
+  
+  .record-btn {
+    width: 64px;
+    height: 64px;
+    font-size: 24px;
+  }
+}
