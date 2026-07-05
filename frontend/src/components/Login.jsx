@@ -3,7 +3,7 @@ import './Auth.css'
 
 const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5001')
 
-export default function Login({ onLogin, onSwitchToSignup, isDarkMode, onToggleTheme }) {
+export default function Login({ onLogin, onSwitchToSignup, onSwitchToForgot, isDarkMode, onToggleTheme }) {
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -190,7 +190,7 @@ export default function Login({ onLogin, onSwitchToSignup, isDarkMode, onToggleT
                 id="username"
                 name="username"
                 type="text"
-                placeholder="Enter username (user1-user4)"
+                placeholder="Enter username"
                 value={formData.username}
                 onChange={handleChange}
                 required
@@ -207,13 +207,24 @@ export default function Login({ onLogin, onSwitchToSignup, isDarkMode, onToggleT
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Enter password (123456)"
+                placeholder="Enter password"
                 value={formData.password}
                 onChange={handleChange}
                 required
                 disabled={loading}
                 autoComplete="current-password"
               />
+              <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: '8px'}}>
+                <button 
+                  type="button" 
+                  className="switch-auth" 
+                  style={{fontSize: '0.85rem'}}
+                  onClick={onSwitchToForgot}
+                  disabled={loading}
+                >
+                  Forgot Password?
+                </button>
+              </div>
             </div>
             
             <button
@@ -231,11 +242,6 @@ export default function Login({ onLogin, onSwitchToSignup, isDarkMode, onToggleT
 
           <div className="google-auth-container">
             <div id="google-signin-button"></div>
-          </div>
-          
-          <div className="demo-users">
-            <h3>Demo Accounts</h3>
-            <p className="demo-note">Username: user1, user2, user3, or user4 | Password: 123456</p>
           </div>
           
           <div className="auth-footer">

@@ -81,6 +81,13 @@ def init_db():
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS password_resets (
+                token TEXT PRIMARY KEY,
+                username TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
         conn.commit()
         conn.close()
         logger.info("[OK] SQLite Database initialized successfully")
@@ -1199,6 +1206,80 @@ def suggest_improvements():
         logger.error(f"Error in suggest_improvements: {e}")
         return jsonify({'error': str(e)}), 500
 
+
+@app.route('/api/auth/verify-reset', methods=['POST'])
+def auth_verify_reset():
+    try:
+        data = request.json
+        if not data or 'username' not in data or 'email' not in data:
+            return jsonify({'error': 'Missing required fields'}), 400
+            
+        username = data['username'].strip().lower()
+        email = data['email'].strip().lower()
+        
+        conn = sqlite3.connect(str(DATABASE_PATH))
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT id FROM users WHERE username = ? AND email = ?", (username, email))
+        user = cursor.fetchone()
+        
+        if not user:
+            conn.close()
+            return jsonify({'error': 'Username and Email combination not found'}), 404
+            
+        # Generate a temporary reset token
+        reset_token = str(uuid.uuid4())
+        
+        # Store the token
+        cursor.execute("INSERT OR REPLACE INTO password_resets (token, username) VALUES (?, ?)", (reset_token, username))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Verification successful', 'reset_token': reset_token})
+    except Exception as e:
+        logger.error(f"Error in verify-reset: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/auth/reset-password', methods=['POST'])
+def auth_reset_password():
+    try:
+        data = request.json
+        if not data or 'reset_token' not in data or 'new_password' not in data:
+            return jsonify({'error': 'Missing required fields'}), 400
+            
+        token = data['reset_token']
+        new_password = data['new_password']
+        
+        if len(new_password) < 6:
+            return jsonify({'error': 'Password must be at least 6 characters'}), 400
+            
+        conn = sqlite3.connect(str(DATABASE_PATH))
+        cursor = conn.cursor()
+        
+        # Verify token
+        cursor.execute("SELECT username FROM password_resets WHERE token = ?", (token,))
+        row = cursor.fetchone()
+        
+        if not row:
+            conn.close()
+            return jsonify({'error': 'Invalid or expired reset token'}), 400
+            
+        username = row[0]
+        pwd_hash = hash_password(new_password)
+        
+        # Update user's password
+        cursor.execute("UPDATE users SET password_hash = ? WHERE username = ?", (pwd_hash, username))
+        
+        # Delete the used token
+        cursor.execute("DELETE FROM password_resets WHERE token = ?", (token,))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Password reset successful'})
+    except Exception as e:
+        logger.error(f"Error in reset-password: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/switch-model', methods=['POST'])
 def switch_model():

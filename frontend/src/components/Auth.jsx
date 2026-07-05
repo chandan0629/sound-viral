@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import Login from './Login'
 import Signup from './Signup'
+import ForgotPassword from './ForgotPassword'
 
 export default function Auth({ onLogin }) {
-  const [isLogin, setIsLogin] = useState(true)
+  const [authMode, setAuthMode] = useState('login') // 'login', 'signup', 'forgot'
   const [user, setUser] = useState(null)
   const [isDarkMode, setIsDarkMode] = useState(true)
 
@@ -56,9 +57,6 @@ export default function Auth({ onLogin }) {
     }
   }
 
-  const switchToSignup = () => setIsLogin(false)
-  const switchToLogin = () => setIsLogin(true)
-
   // If user is already logged in, don't show auth forms
   if (user) {
     return null
@@ -66,17 +64,26 @@ export default function Auth({ onLogin }) {
 
   return (
     <>
-      {isLogin ? (
+      {authMode === 'login' && (
         <Login 
           onLogin={handleLogin} 
-          onSwitchToSignup={switchToSignup}
+          onSwitchToSignup={() => setAuthMode('signup')}
+          onSwitchToForgot={() => setAuthMode('forgot')}
           isDarkMode={isDarkMode}
           onToggleTheme={toggleTheme}
         />
-      ) : (
+      )}
+      {authMode === 'signup' && (
         <Signup 
           onSignup={handleSignup} 
-          onSwitchToLogin={switchToLogin}
+          onSwitchToLogin={() => setAuthMode('login')}
+          isDarkMode={isDarkMode}
+          onToggleTheme={toggleTheme}
+        />
+      )}
+      {authMode === 'forgot' && (
+        <ForgotPassword 
+          onSwitchToLogin={() => setAuthMode('login')}
           isDarkMode={isDarkMode}
           onToggleTheme={toggleTheme}
         />
