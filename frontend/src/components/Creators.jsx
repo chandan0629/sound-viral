@@ -5,52 +5,52 @@ export default function Creators() {
   const creators = [
     {
       id: 1,
-      name: 'Chandan Kumar Raj',
-      title: 'Data Collection, Frontend, Backend',
-      role: '👨‍💻 Lead Developer',
-      bio: 'Pioneered data collection strategies and developed both the intuitive frontend interfaces and robust backend architectures.',
-      expertise: ['Data Collection', 'Frontend', 'Backend', 'Full Stack'],
-      social: { github: '#', linkedin: '#', twitter: '#' },
-      image: '👨‍💼'
-    },
-    {
-      id: 2,
       name: 'Arin Karmakar',
       title: 'Data Mutation, Frontend, Backend',
-      role: '👨‍💻 ML & Full Stack',
+      role: 'Developer',
       bio: 'Built the complete Song Virality Prediction system with AI/ML integration, React frontend, and Flask API.',
       expertise: ['Data Mutation', 'Machine Learning', 'React', 'Flask'],
       social: { github: 'https://github.com/GODL0111', linkedin: '#', twitter: '#' },
       image: '👨‍💻'
+    };  
+    {
+     id: 2,
+      name: 'Chandan Kumar Raj',
+      title: 'Data Collection, Frontend, Backend, Deployment',
+      role: 'Developer',
+      bio: 'Pioneered data collection strategies and developed both the intuitive frontend interfaces and robust backend architectures.',
+      expertise: ['Data Collection', 'Frontend', 'Backend', 'Full Stack'],
+      social: { github: 'https://github.com/chandan0629', linkedin: '#'  },
+      image: '👨‍💼'
     },
     {
       id: 3,
       name: 'Kumar Mridul',
       title: 'Data Analysis, Deployment, Testing, Backend',
-      role: '🚀 Dev & DevOps',
+      role: 'Developer',',
       bio: 'Handled complex data analysis, ensured robust testing, built backend infrastructure, and managed seamless deployments.',
       expertise: ['Data Analysis', 'Deployment', 'Testing', 'Backend'],
-      social: { github: '#', linkedin: '#', twitter: '#' },
+      social: { github: 'https://github.com/Mridul-Srivastava03', linkedin: '#' },
       image: '👨‍🔧'
     },
     {
       id: 4,
       name: 'Ragini Shaw',
       title: 'Data Cross-validation, Frontend, Documentation',
-      role: '🎨 Frontend & UX',
+      role: 'Developer',',
       bio: 'Ensured data accuracy through cross-validation, crafted beautiful frontend components, and wrote extensive documentation.',
       expertise: ['Cross-validation', 'Frontend', 'UI/UX', 'Documentation'],
-      social: { github: '#', linkedin: '#', twitter: '#' },
+      social: { github: 'https://github.com/Ragini-Shaw06', linkedin: '#' },
       image: '👩‍💻'
     },
     {
       id: 5,
       name: 'Nandini Singh',
       title: 'Data Analysis, Research, Testing, Documentation',
-      role: '📊 Research & QA',
+      role: 'Research & Developer',',
       bio: 'Led the research initiatives, performed in-depth data analysis, maintained testing standards, and authored comprehensive docs.',
       expertise: ['Data Analysis', 'Research', 'Testing', 'Documentation'],
-      social: { github: '#', linkedin: '#', twitter: '#' },
+      social: { github: '#', linkedin: '#' },
       image: '👩‍🔬'
     }
   ]
