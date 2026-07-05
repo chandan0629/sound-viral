@@ -44,29 +44,30 @@
 
 /* Record Button */
 .record-btn {
-  width: 80px;
-  height: 80px;
+  padding: var(--space-4) var(--space-8);
   border-radius: var(--radius-full);
   background: var(--gradient-primary);
   border: none;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
   color: white;
   transition: all var(--duration-normal) var(--ease-smooth);
   box-shadow: var(--shadow-glow-pink);
   position: relative;
+  min-width: 220px;
 }
 
 .record-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 50px rgba(255, 122, 182, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 0 40px rgba(255, 122, 182, 0.4);
 }
 
 .record-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
 .record-btn.recording {
@@ -125,8 +126,31 @@
   }
   
   .record-btn {
-    width: 64px;
-    height: 64px;
-    font-size: 24px;
+    min-width: 100%;
+    font-size: var(--font-size-base);
   }
+}
+
+.record-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-8);
+}
+
+.record-icon {
+  font-size: 64px;
+  margin-bottom: var(--space-2);
+  filter: drop-shadow(0 0 12px rgba(255, 122, 182, 0.3));
+}
+
+.record-icon.pulse {
+  animation: iconPulse 1s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(255, 122, 182, 0.3)); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 25px rgba(255, 122, 182, 0.6)); }
 }
