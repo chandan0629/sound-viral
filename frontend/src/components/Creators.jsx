@@ -12,7 +12,7 @@ export default function Creators() {
       expertise: ['Data Mutation', 'Machine Learning', 'React', 'Flask'],
       social: { github: 'https://github.com/GODL0111', linkedin: '#', twitter: '#' },
       image: '👨‍💻'
-    };  
+    }, 
     {
      id: 2,
       name: 'Chandan Kumar Raj',
