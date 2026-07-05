@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import './Layout.css'
+import TiltCard from './TiltCard'
 
 // Lazy load components
 const PredictorForm = React.lazy(() => import('./PredictorForm'))
@@ -157,6 +158,13 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
       <main className={`main-content ${pageTransition}`} ref={mainRef} key={pageKey}>
         {currentPage === 'home' && (
           <div className="home-page stagger-children">
+            <TiltCard tiltMax={5} className="hero-visual-card">
+              <div className="hero-image-wrapper">
+                <img src="/images/hero_music_ai.jpg" alt="Music AI Visualization" className="hero-image" />
+                <div className="hero-image-overlay"></div>
+              </div>
+            </TiltCard>
+
             <div className="welcome-section">
               <h1 className="title-3d">
                 <span className="gradient-text">SoundViral</span>
