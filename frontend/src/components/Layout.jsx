@@ -157,39 +157,81 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
       {/* Main Content with Page Transitions */}
       <main className={`main-content ${pageTransition}`} ref={mainRef} key={pageKey}>
         {currentPage === 'home' && (
-          <div className="home-page stagger-children">
-            <TiltCard tiltMax={5} className="hero-visual-card">
-              <div className="hero-image-wrapper">
-                <img src="/images/hero_music_ai.jpg" alt="Music AI Visualization" className="hero-image" />
-                <div className="hero-image-overlay"></div>
-              </div>
-            </TiltCard>
-
-            <div className="welcome-section">
-              <h1 className="title-3d">
-                <span className="gradient-text">SoundViral</span>
+          <div className="spotify-dashboard stagger-children">
+            <div className="dashboard-header">
+              <h1 className="greeting-text">
+                {(() => {
+                  const hour = new Date().getHours();
+                  if (hour < 12) return 'Good morning';
+                  if (hour < 18) return 'Good afternoon';
+                  return 'Good evening';
+                })()}
               </h1>
-              <p className="subtitle">Predict Your Song's Viral Potential</p>
-              <p className="description">
-                AI-powered machine learning trained on 176,000+ tracks from multiple Spotify datasets.
-                Analyze features, test hooks, and maximize your song's chance to go viral.
-              </p>
-              <div className="quick-buttons">
-                <button className="btn primary large glow-btn" onClick={() => navigate('static')}>
-                  <span>Start Analyzing</span>
-                  <span className="btn-arrow">→</span>
-                </button>
-                <button className="btn secondary large" onClick={() => navigate('live')}>
-                  <span>Live Test</span>
-                  <span className="btn-arrow">🎵</span>
-                </button>
-              </div>
             </div>
-            <aside className="game-dashboard-container">
-              <React.Suspense fallback={<LoadingFallback />}>
-                <GameDashboard score={score} logs={logs} />
-              </React.Suspense>
-            </aside>
+
+            {/* Quick Actions Grid (Spotify's Top 6-8 Cards) */}
+            <div className="quick-grid">
+              {[
+                { title: 'Static Viral Check', img: '/images/cover_synthwave.jpg', path: 'static', icon: '📊' },
+                { title: 'Live Song Test', img: '/images/cover_pop.jpg', path: 'live', icon: '🎵' },
+                { title: 'Live Recording', img: '/images/cover_acoustic.jpg', path: 'record', icon: '🎙️' },
+                { title: 'Recommendations', img: '/images/cover_hiphop.jpg', path: 'recommend', icon: '💡' },
+                { title: 'Creators Board', img: '/images/hero_music_ai.jpg', path: 'creators', icon: '👤' },
+                { title: 'Your Dashboard', img: '/images/cover_synthwave.jpg', path: 'home', icon: '🏠' }
+              ].map((item, i) => (
+                <div key={i} className="quick-card" onClick={() => navigate(item.path)}>
+                  <img src={item.img} alt={item.title} className="quick-img" />
+                  <div className="quick-title">{item.icon} {item.title}</div>
+                  <button className="play-btn">
+                    <svg height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="8 5 8 19 19 12"></polygon>
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Trending / Made For You Shelf */}
+            <section className="shelf-section">
+              <div className="shelf-header">
+                <h2>Made For You</h2>
+                <span className="show-all">Show all</span>
+              </div>
+              <div className="shelf-container">
+                {[
+                  { title: 'Daily Mix 1', desc: 'Predictions for your latest tracks.', img: '/images/cover_pop.jpg' },
+                  { title: 'Top Hits', desc: 'The most viral songs this week.', img: '/images/cover_hiphop.jpg' },
+                  { title: 'Chill Vibes', desc: 'Relaxing acoustic analysis.', img: '/images/cover_acoustic.jpg' },
+                  { title: 'Synthwave Classics', desc: 'Retro electronic deep dive.', img: '/images/cover_synthwave.jpg' },
+                  { title: 'AI Generated', desc: 'Machine learning masterpieces.', img: '/images/hero_music_ai.jpg' }
+                ].map((item, i) => (
+                  <TiltCard key={i} tiltMax={10} className="shelf-card">
+                    <div className="shelf-img-wrapper">
+                      <img src={item.img} alt={item.title} className="shelf-img" />
+                      <button className="play-btn-large">
+                        <svg height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="8 5 8 19 19 12"></polygon>
+                        </svg>
+                      </button>
+                    </div>
+                    <h3 className="shelf-title">{item.title}</h3>
+                    <p className="shelf-desc">{item.desc}</p>
+                  </TiltCard>
+                ))}
+              </div>
+            </section>
+
+            {/* Game Dashboard Integration */}
+            <section className="shelf-section">
+              <div className="shelf-header">
+                <h2>Your Progress</h2>
+              </div>
+              <div className="dashboard-inline-wrapper">
+                <React.Suspense fallback={<LoadingFallback />}>
+                  <GameDashboard score={score} logs={logs} />
+                </React.Suspense>
+              </div>
+            </section>
           </div>
         )}
 
