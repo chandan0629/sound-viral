@@ -254,7 +254,7 @@ export default function LiveSongTest() {
                     Analyze Song
                   </button>
                 )}
-              </TiltCard>
+              </div>
             )}
 
             {/* Upload Progress */}
@@ -690,13 +690,13 @@ export default function LiveSongTest() {
                   </p>
                 </div>
               )}
-            </div>
+            </TiltCard>
 
               <div className="result-actions" style={{display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
                 <button className="btn secondary" onClick={handleDownloadReport}>Download PDF Report</button>
                 <button className="btn primary" onClick={resetForm}>Test Another Song</button>
               </div>
-            </TiltCard>
+            </div>
         )}
       </div>
       
