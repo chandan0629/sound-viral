@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react'
 import html2pdf from 'html2pdf.js'
 import ReportTemplate from './ReportTemplate'
+import TiltCard from './TiltCard'
 import './LiveSongTest.css'
 
 // Use relative URL for Vercel (same domain), fallback to localhost for development
@@ -210,12 +211,13 @@ export default function LiveSongTest() {
         {!result ? (
           <div className="upload-section">
             {/* Upload Area */}
-            <div 
+            <TiltCard 
               className={`upload-area ${dragActive ? 'drag-active' : ''}`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
+              tiltMax={5}
             >
               <div className="upload-content">
                 <div className="upload-icon">🎵</div>
@@ -232,7 +234,7 @@ export default function LiveSongTest() {
                 </label>
                 <p className="file-info">MP3, WAV, OGG, M4A up to 50MB</p>
               </div>
-            </div>
+            </TiltCard>
 
             {/* Selected File Display */}
             {file && (
@@ -252,7 +254,7 @@ export default function LiveSongTest() {
                     Analyze Song
                   </button>
                 )}
-              </div>
+              </TiltCard>
             )}
 
             {/* Upload Progress */}
@@ -335,7 +337,7 @@ export default function LiveSongTest() {
         ) : (
           /* Results Display */
           <div className="results-section">
-            <div className={`result-card ${result.isViral ? 'viral' : 'not-viral'}`}>
+            <TiltCard tiltMax={3} className={`result-card ${result.isViral ? 'viral' : 'not-viral'}`}>
               <div className="result-header">
                 <h3>{result.isViral ? '🚀 Viral Hit!' : '📊 Below Average'}</h3>
                 <p className="song-title">{result.fileName}</p>
@@ -694,7 +696,7 @@ export default function LiveSongTest() {
                 <button className="btn secondary" onClick={handleDownloadReport}>Download PDF Report</button>
                 <button className="btn primary" onClick={resetForm}>Test Another Song</button>
               </div>
-            </div>
+            </TiltCard>
         )}
       </div>
       

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import html2pdf from 'html2pdf.js';
 import ReportTemplate from './ReportTemplate';
+import TiltCard from './TiltCard';
 import './LiveRecording.css';
 
 export default function LiveRecording() {
@@ -243,7 +244,7 @@ export default function LiveRecording() {
               </div>
             )}
 
-            <div className={`record-area ${isRecording ? 'recording' : ''}`}>
+            <TiltCard tiltMax={5} className={`record-area ${isRecording ? 'recording' : ''}`}>
               <div className="record-content">
                 <div className={`record-icon ${isRecording ? 'pulse' : ''}`}>🎤</div>
                 <h3 className="timer">{formatTime(recordingTime)}</h3>
@@ -270,7 +271,7 @@ export default function LiveRecording() {
                   </div>
                 )}
               </div>
-            </div>
+            </TiltCard>
 
             {uploading && (
               <div className="progress-section">
@@ -295,7 +296,7 @@ export default function LiveRecording() {
           </div>
         ) : (
           <div className="results-section">
-            <div className={`result-card ${result.isViral ? 'viral' : 'not-viral'}`}>
+            <TiltCard tiltMax={3} className={`result-card ${result.isViral ? 'viral' : 'not-viral'}`}>
               <div className="result-header">
                 <h3>{result.isViral ? '🚀 Viral Hit!' : '📊 Below Average'}</h3>
                 <p className="song-title">{result.fileName}</p>
@@ -479,12 +480,11 @@ export default function LiveRecording() {
                 </div>
               )}
 
-              <div className="result-actions">
+              <div className="result-actions" style={{display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
                 <button className="btn secondary" onClick={handleDownloadReport}>Download PDF Report</button>
-                <button className="btn secondary" onClick={handleDownloadAudio}>Download Audio</button>
-                <button className="btn primary" onClick={resetRecording}>Try Another</button>
+                <button className="btn primary" onClick={resetRecording}>Test Another Recording</button>
               </div>
-            </div>
+            </TiltCard>
           </div>
         )}
       </div>
