@@ -24,7 +24,7 @@ RUN pip install --upgrade pip && \
 COPY . /app/
 
 # Expose port
-EXPOSE 5001
+EXPOSE 7860
 
 # Run gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "2", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:7860", "--workers", "2", "--timeout", "120", "app:app"]

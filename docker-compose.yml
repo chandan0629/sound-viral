@@ -7,10 +7,10 @@ services:
       dockerfile: Dockerfile
     container_name: soundviral-backend
     ports:
-      - "5001:5001"
+      - "7860:7860"
     environment:
       - FLASK_ENV=production
-      - FLASK_PORT=5001
+      - FLASK_PORT=7860
       - DATABASE_PATH=/app/data/users.db
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     volumes:
