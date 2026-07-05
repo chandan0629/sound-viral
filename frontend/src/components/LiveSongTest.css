@@ -955,13 +955,18 @@
   letter-spacing: 1px;
 }
 
-/* Feature Stats Grid (Tempo, Loudness, Key, Duration) */
 .feature-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
   margin-top: var(--space-8);
   width: 100%;
+}
+
+@media (min-width: 768px) {
+  .feature-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .stat-item {
