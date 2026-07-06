@@ -15,6 +15,19 @@
   transition: background-color 0.4s var(--ease-smooth), color 0.4s var(--ease-smooth);
 }
 
+.layout::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: var(--gradient-glow);
+  z-index: var(--z-overlay);
+  transition: opacity 0.3s ease;
+}
+
 /* ========== DYNAMIC AMBIENT BACKGROUND ========== */
 
 .ambient-bg {

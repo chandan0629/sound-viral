@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import TiltCard from './TiltCard'
 
 // Use relative URL for Vercel (same domain), fallback to localhost for development
 const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5001')
@@ -125,7 +126,7 @@ export default function PredictorForm({onResult}){
   }
 
   return (
-    <div className="card">
+    <TiltCard className="card" tiltMax={3} glare={true}>
       <h2>Design your track</h2>
       
       {backendStatus === false && (
@@ -208,6 +209,6 @@ export default function PredictorForm({onResult}){
           )}
         </div>
       )}      
-    </div>
+    </TiltCard>
   )
 }

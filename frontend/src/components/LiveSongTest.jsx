@@ -202,7 +202,7 @@ export default function LiveSongTest() {
         <p>Upload a song and get instant viral analysis</p>
       </div>
 
-      <div className="test-container">
+      <TiltCard className="test-container" tiltMax={2} glare={false}>
         {error && (
           <div className="result error" style={{marginBottom: '24px'}}>
             <p>Error: {error}</p>
@@ -698,7 +698,7 @@ export default function LiveSongTest() {
               </div>
             </div>
         )}
-      </div>
+      </TiltCard>
       
       {/* Hidden PDF Template */}
       <div className="pdf-hidden-wrapper">

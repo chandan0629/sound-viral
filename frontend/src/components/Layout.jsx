@@ -71,9 +71,18 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
       <span>Loading...</span>
     </div>
   )
+  // Global Cursor Lighting
+  const layoutRef = useRef(null)
+  const handleMouseMove = (e) => {
+    if (!layoutRef.current) return
+    const x = (e.clientX / window.innerWidth) * 100
+    const y = (e.clientY / window.innerHeight) * 100
+    layoutRef.current.style.setProperty('--mouse-x', `${x}%`)
+    layoutRef.current.style.setProperty('--mouse-y', `${y}%`)
+  }
 
   return (
-    <div className="layout">
+    <div className="layout" ref={layoutRef} onMouseMove={handleMouseMove}>
       {/* Dynamic Ambient Background */}
       <div className="ambient-bg">
         <div className="ambient-orb orb-1"></div>
