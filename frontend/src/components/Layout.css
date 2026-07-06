@@ -15,6 +15,63 @@
   transition: background-color 0.4s var(--ease-smooth), color 0.4s var(--ease-smooth);
 }
 
+/* ========== DYNAMIC AMBIENT BACKGROUND ========== */
+
+.ambient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: var(--z-background);
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--color-bg-primary);
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+  animation: floatOrb 20s infinite ease-in-out alternate;
+}
+
+.orb-1 {
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, var(--color-accent-primary) 0%, transparent 70%);
+  top: -20%;
+  left: -10%;
+  animation-duration: 25s;
+}
+
+.orb-2 {
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, var(--color-accent-cyan) 0%, transparent 70%);
+  bottom: -20%;
+  right: -10%;
+  animation-duration: 22s;
+  animation-delay: -5s;
+}
+
+.orb-3 {
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(circle, var(--color-accent-secondary) 0%, transparent 70%);
+  top: 40%;
+  left: 40%;
+  animation-duration: 28s;
+  animation-delay: -10s;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(5%, 10%) scale(1.1); }
+  100% { transform: translate(-10%, 5%) scale(0.9); }
+}
+
 /* ========== HAMBURGER MENU BUTTON ========== */
 
 .hamburger {
@@ -412,6 +469,7 @@
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center; /* Enforce justify */
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6);
   border: 1px solid var(--color-border);
@@ -436,15 +494,22 @@
   color: white;
   border: none;
   box-shadow: var(--shadow-glow-pink);
+  animation: btnPulse 3s infinite alternate ease-in-out;
+}
+
+@keyframes btnPulse {
+  0% { box-shadow: 0 0 20px rgba(255, 122, 182, 0.4); }
+  100% { box-shadow: 0 0 40px rgba(255, 122, 182, 0.8), 0 0 10px rgba(102, 126, 234, 0.5); }
 }
 
 .btn.primary:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 0 40px rgba(255, 122, 182, 0.3), 0 0 80px rgba(255, 122, 182, 0.1);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 0 50px rgba(255, 122, 182, 0.6), 0 0 100px rgba(255, 122, 182, 0.2);
+  animation-play-state: paused;
 }
 
 .btn.primary:active {
-  transform: translateY(1px) scale(0.98);
+  transform: translateY(2px) scale(0.95);
 }
 
 .btn.secondary {
@@ -457,8 +522,12 @@
 .btn.secondary:hover {
   background: var(--color-bg-card-hover);
   border-color: var(--color-accent-primary);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: var(--shadow-glow-pink);
+}
+
+.btn.secondary:active {
+  transform: translateY(2px) scale(0.95);
 }
 
 .btn-arrow {

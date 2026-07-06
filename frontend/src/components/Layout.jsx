@@ -74,6 +74,13 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
 
   return (
     <div className="layout">
+      {/* Dynamic Ambient Background */}
+      <div className="ambient-bg">
+        <div className="ambient-orb orb-1"></div>
+        <div className="ambient-orb orb-2"></div>
+        <div className="ambient-orb orb-3"></div>
+      </div>
+
       {/* Always-on 3D particle background */}
       <React.Suspense fallback={null}>
         <ThreeDCanvas activePage={currentPage} />
