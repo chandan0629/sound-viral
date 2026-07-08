@@ -562,17 +562,17 @@ class SongHitPredictor:
             # Equal weight average (raw probability)
             raw_prob = (xgb_proba + rf_proba + lr_proba) / 3
             
-            # PROBABILITY SCALING for realistic hit scores
-            # Model outputs range roughly 0.27-0.67 (non-hit min to hit max)
-            # We want to scale this to ~0.05-0.95 for meaningful display
-            # Lower minimum (0.05) so amateur recordings show very low scores
-            # 
-            # Scaling formula: map [0.27, 0.67] -> [0.05, 0.95]
-            min_raw, max_raw = 0.27, 0.67
+            # Use dynamic metadata bounds for scaling if available
+            hit_mean = self.model_metadata.get('hit_mean_prob', 0.53) if hasattr(self, 'model_metadata') else 0.53
+            non_hit_mean = self.model_metadata.get('non_hit_mean_prob', 0.43) if hasattr(self, 'model_metadata') else 0.43
+            
+            # Set dynamic raw bounds based on standard deviations around the means
+            # (Roughly ±2 stdev from the centers)
+            min_raw = non_hit_mean - 0.15
+            max_raw = hit_mean + 0.15
+            
             min_scaled, max_scaled = 0.05, 0.95
             
-            # DON'T clip - allow raw values below 0.27 to go negative (then clip to 0.05)
-            # This ensures amateur recordings with low raw prob get very low scaled scores
             scaled_prob = (raw_prob - min_raw) / (max_raw - min_raw) * (max_scaled - min_scaled) + min_scaled
             scaled_prob = max(min_scaled, min(max_scaled, scaled_prob))
             
