@@ -226,12 +226,12 @@ export default function ThreeDCanvas({ activePage = 'home' }) {
       particles.rotation.y = time * 0.05
       particles.rotation.x = Math.sin(time * 0.03) * 0.1
 
-      // Spring mouse follow for camera
-      smoothMouseX += (mouseX * 3 - smoothMouseX) * 0.03
-      smoothMouseY += (mouseY * 2 - smoothMouseY) * 0.03
+      // Spring mouse follow for camera (DISABLED to make static)
+      // smoothMouseX += (mouseX * 3 - smoothMouseX) * 0.03
+      // smoothMouseY += (mouseY * 2 - smoothMouseY) * 0.03
 
-      camera.position.x = smoothMouseX
-      camera.position.y = -smoothMouseY
+      camera.position.x = 0
+      camera.position.y = 0
       camera.lookAt(scene.position)
 
       renderer.render(scene, camera)
@@ -303,6 +303,8 @@ export default function ThreeDCanvas({ activePage = 'home' }) {
         overflow: 'hidden',
         pointerEvents: 'none',
         zIndex: 0,
+        opacity: activePage === 'home' ? 0 : 1,
+        transition: 'opacity 1s ease-in-out',
       }}
     />
   )
