@@ -30,6 +30,8 @@ jobs:
         
       - name: Build Frontend
         working-directory: ./frontend
+        env:
+          VITE_API_URL: http://192.168.1.31:5001
         run: npm run build
         
       - name: Sync Capacitor Android
@@ -39,6 +41,7 @@ jobs:
       - name: Build Android APK
         working-directory: ./frontend/android
         run: |
+          sed -i 's/<application/<application android:usesCleartextTraffic="true"/g' app/src/main/AndroidManifest.xml
           chmod +x gradlew
           ./gradlew assembleDebug
           
