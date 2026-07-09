@@ -284,10 +284,9 @@ def extract_features_from_array(y, sr):
         # Commercial music: -5 to -14 dB, Amateur: -20 to -40 dB
         loudness_db = 20 * np.log10(rms_mean + 1e-10)
         # Calibration: Shift but keep full range to differentiate amateur vs pro
-        # Spotify's My Heart Will Go On is -11.7 dB, our raw was ~ -19.6 dB. So shift by ~8 dB instead of 15.
-        loudness_calibrated = loudness_db + 8.0  
+        loudness_calibrated = loudness_db + 15  # Moderate offset
         # Allow wider range to differentiate amateur (quieter) from commercial (louder)
-        features['loudness'] = float(np.clip(loudness_calibrated, -40, 0))
+        features['loudness'] = float(np.clip(loudness_calibrated, -40, -3))
         all_features['loudness_raw_db'] = round(float(loudness_db), 2)
         
         # === SPECTRAL FEATURES ===
@@ -374,15 +373,15 @@ def extract_features_from_array(y, sr):
         
         # Combined valence with empirical calibration
         valence_raw = (
-            0.35 * mode_factor +           # Major/minor influence heavily dictates valence
-            0.20 * brightness +            # Spectral brightness
-            0.15 * tempo_valence +         # Tempo influence
-            0.10 * features['energy'] +    # Energy contribution
-            0.20 * harmonic_simplicity     # Harmonic clarity
+            0.25 * mode_factor +           # Major/minor influence
+            0.25 * brightness +            # Spectral brightness
+            0.20 * tempo_valence +         # Tempo influence
+            0.15 * features['energy'] +    # Energy contribution
+            0.15 * harmonic_simplicity     # Harmonic clarity
         )
-        # Let valence be more extreme by stretching it
-        valence_calibrated = np.clip(valence_raw ** 1.5, 0, 1)
-        features['valence'] = float(valence_calibrated)
+        # Calibration: Center around 0.5 and spread
+        valence_calibrated = 0.5 + (valence_raw - 0.5) * 1.4
+        features['valence'] = float(np.clip(valence_calibrated, 0, 1))
         all_features['mode_factor'] = round(float(mode_factor), 4)
         all_features['brightness'] = round(float(brightness), 4)
         
@@ -419,15 +418,15 @@ def extract_features_from_array(y, sr):
         high_freq_content = rolloff_norm
         
         acousticness_raw = (
-            0.40 * (1.0 - high_freq_content) +     # Less high frequency
+            0.35 * (1.0 - high_freq_content) +     # Less high frequency
             0.30 * harmonic_ratio +                 # More harmonic
-            0.30 * (1.0 - features['energy'])      # Typically quieter (energy is usually high if not acoustic)
+            0.20 * (1.0 - features['energy']) +    # Typically quieter
+            0.15 * (1.0 - percussive_ratio)        # Less percussive
         )
-        # CALIBRATION: Allow true acoustic songs to reach high values, but push borderline songs down
-        # Use a power function to curve it: low stays low, high reaches high
-        acousticness_calibrated = np.clip(acousticness_raw ** 1.5, 0, 1)
-        features['acousticness'] = float(acousticness_calibrated)
-
+        # CALIBRATION: Commercial music is mostly NOT acoustic
+        # Reduce the base value significantly
+        acousticness_calibrated = acousticness_raw * 0.4  # Reduced from 1.1
+        features['acousticness'] = float(np.clip(acousticness_calibrated, 0, 1))
         
         # === LIVENESS (Spotify-calibrated) ===
         # Live recordings: audience noise, reverb, less consistent dynamics
@@ -465,10 +464,9 @@ def extract_features_from_array(y, sr):
             0.30 * harmonic_ratio
         )
         # CALIBRATION: Most pop/rock has vocals = LOW instrumentalness
-        # Use a steep curve instead of linear suppression so true instrumentals survive
-        instrumentalness_calibrated = instrumental_raw ** 3.0
+        # Reduce significantly - typical value for vocal tracks is 0.0 to 0.1
+        instrumentalness_calibrated = instrumental_raw * 0.15  # Reduced from 0.8
         features['instrumentalness'] = float(np.clip(instrumentalness_calibrated, 0, 1))
-
         
         # === KEY (0-11) ===
         features['key'] = key
