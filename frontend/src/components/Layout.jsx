@@ -13,7 +13,6 @@ const ThreeDCanvas = React.lazy(() => import('./ThreeDCanvas'))
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', icon: '🏠' },
-  { id: 'static', label: 'Static Viral Check', icon: '📊' },
   { id: 'live', label: 'Live Song Test', icon: '🎵' },
   { id: 'record', label: 'Live Recording', icon: '🎙️' },
   { id: 'recommend', label: 'Recommendations', icon: '💡' },
@@ -188,7 +187,6 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
             {/* Quick Actions Grid (Spotify's Top 6-8 Cards) */}
             <div className="quick-grid">
               {[
-                { title: 'Static Viral Check', img: '/images/cover_synthwave.jpg', path: 'static', icon: '📊' },
                 { title: 'Live Song Test', img: '/images/cover_pop.jpg', path: 'live', icon: '🎵' },
                 { title: 'Live Recording', img: '/images/cover_acoustic.jpg', path: 'record', icon: '🎙️' },
                 { title: 'Recommendations', img: '/images/cover_hiphop.jpg', path: 'recommend', icon: '💡' },
@@ -251,24 +249,7 @@ export default function Layout({ score, logs, onResult, user, onLogout }) {
           </div>
         )}
 
-        {currentPage === 'static' && (
-          <div className="static-page stagger-children">
-            <div className="page-header">
-              <h2 className="gradient-text">Static Viral Check</h2>
-              <p>Analyze song features for viral potential</p>
-            </div>
-            <div className="static-content">
-              <div className="static-intro">
-                <p>Fine-tune your song's audio features to maximize its viral potential.</p>
-              </div>
-              <div className="form-container">
-                <React.Suspense fallback={<LoadingFallback />}>
-                  <PredictorForm onResult={onResult} />
-                </React.Suspense>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {currentPage === 'live' && (
           <div className="live-page page-enter">
