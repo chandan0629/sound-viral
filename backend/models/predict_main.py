@@ -573,17 +573,12 @@ class SongHitPredictor:
             raw_prob = (xgb_proba + rf_proba + lr_proba) / 3
             logger.info(f"[ENSEMBLE] Raw probabilities: XGB={xgb_proba:.4f}, RF={rf_proba:.4f}, LR={lr_proba:.4f}, AVG={raw_prob:.4f}")
             
-            # Mathematically derived bounds to guarantee user's exact requirements:
-            # Celine Dion raw prob is ~0.51. Pop hits raw prob is ~0.65.
-            # To map 0.51 to 50% and 0.65 to 95%, we need min_raw=0.37, max_raw=0.65
-            min_raw, max_raw = 0.37, 0.65
-            min_scaled, max_scaled = 0.05, 0.95
+            # Predict according to the model's training data without artificial scaling.
+            # The model is calibrated, so the raw probability is the real statistical probability.
+            scaled_prob = float(raw_prob)
             
-            scaled_prob = (raw_prob - min_raw) / (max_raw - min_raw) * (max_scaled - min_scaled) + min_scaled
-            scaled_prob = max(min_scaled, min(max_scaled, scaled_prob))
-            
-            # Threshold at 50% of scaled range
-            hit_threshold = 0.50
+            # Use the actual training data hit mean as the threshold for determining a hit
+            hit_threshold = self.model_metadata.get('hit_mean_prob', 0.50)
             is_hit = scaled_prob >= hit_threshold
             
             # Confidence based on model agreement
