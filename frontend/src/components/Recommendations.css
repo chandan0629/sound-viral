@@ -244,11 +244,20 @@
 
 @media (max-width: 768px) {
   .recommendation-card {
-    min-width: 280px;
+    min-width: 80vw;
   }
   
   .tips-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .recommendation-card {
+    min-width: 85vw;
+  }
+  .success-number {
+    font-size: var(--font-size-4xl);
   }
 }
 

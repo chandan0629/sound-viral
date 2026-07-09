@@ -1025,3 +1025,15 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+@media (max-width: 480px) {
+  .score-value {
+    font-size: 48px;
+  }
+  .extended-features-grid {
+    grid-template-columns: 1fr;
+  }
+  .upload-area {
+    padding: var(--space-6) var(--space-2);
+  }
+}

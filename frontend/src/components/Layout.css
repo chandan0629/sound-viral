@@ -1107,3 +1107,36 @@ input[type="range"]::-moz-range-thumb {
   padding: var(--space-6);
   box-shadow: var(--shadow-sm);
 }
+
+/* Responsive Spotify Dashboard */
+@media (max-width: 768px) {
+  .spotify-dashboard {
+    padding: var(--space-4) 0;
+  }
+  .quick-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .quick-card {
+    height: 64px;
+  }
+  .quick-img {
+    width: 64px;
+    height: 64px;
+  }
+  .quick-title {
+    font-size: var(--font-size-sm);
+  }
+  .shelf-card {
+    min-width: 140px;
+    width: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-header .greeting-text {
+    font-size: var(--font-size-2xl);
+  }
+}
