@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import './Auth.css'
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5001')
+const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://192.168.1.31:5001')
 
 export default function ForgotPassword({ onSwitchToLogin, isDarkMode, onToggleTheme }) {
   const [step, setStep] = useState(1) // 1: Verify, 2: Reset Password

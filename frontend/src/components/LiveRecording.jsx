@@ -23,7 +23,7 @@ export default function LiveRecording() {
   const reportRef = useRef(null);
   const audioRef = useRef(null);
 
-  const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5001');
+  const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://192.168.1.31:5001');
 
   useEffect(() => {
     return () => {
