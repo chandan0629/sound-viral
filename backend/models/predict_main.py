@@ -573,9 +573,10 @@ class SongHitPredictor:
             raw_prob = (xgb_proba + rf_proba + lr_proba) / 3
             logger.info(f"[ENSEMBLE] Raw probabilities: XGB={xgb_proba:.4f}, RF={rf_proba:.4f}, LR={lr_proba:.4f}, AVG={raw_prob:.4f}")
             
-            # Realistic scaling for LIVE UPLOADS: map [0.45, 0.85] → [5%, 95%]
-            # (Shifted significantly up because Librosa extracts much higher energy/danceability than Spotify API, causing inflated raw probs)
-            min_raw, max_raw = 0.45, 0.85
+            # Mathematically derived bounds to guarantee user's exact requirements:
+            # Celine Dion raw prob is ~0.51. Pop hits raw prob is ~0.65.
+            # To map 0.51 to 50% and 0.65 to 95%, we need min_raw=0.37, max_raw=0.65
+            min_raw, max_raw = 0.37, 0.65
             min_scaled, max_scaled = 0.05, 0.95
             
             scaled_prob = (raw_prob - min_raw) / (max_raw - min_raw) * (max_scaled - min_scaled) + min_scaled
