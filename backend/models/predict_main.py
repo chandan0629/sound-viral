@@ -573,8 +573,9 @@ class SongHitPredictor:
             raw_prob = (xgb_proba + rf_proba + lr_proba) / 3
             logger.info(f"[ENSEMBLE] Raw probabilities: XGB={xgb_proba:.4f}, RF={rf_proba:.4f}, LR={lr_proba:.4f}, AVG={raw_prob:.4f}")
             
-            # Realistic scaling: map [0.30, 0.60] → [5%, 95%]
-            min_raw, max_raw = 0.30, 0.60
+            # Realistic scaling: map [0.35, 0.70] → [5%, 95%]
+            # (Shifted up to account for Librosa feature extraction skew which tends to yield higher raw probs)
+            min_raw, max_raw = 0.35, 0.70
             min_scaled, max_scaled = 0.05, 0.95
             
             scaled_prob = (raw_prob - min_raw) / (max_raw - min_raw) * (max_scaled - min_scaled) + min_scaled
