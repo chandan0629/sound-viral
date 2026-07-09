@@ -12,7 +12,7 @@ export default function LiveSongTestIntegrated() {
   const [progress, setProgress] = useState(0)
 
   // Use relative URL for Vercel (same domain), fallback to localhost for development
-  const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://192.168.1.31:5001')
+  const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5001')
 
   const handleDrag = (e) => {
     e.preventDefault()
