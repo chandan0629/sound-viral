@@ -566,10 +566,11 @@ class SongHitPredictor:
             hit_mean = self.model_metadata.get('hit_mean_prob', 0.53) if hasattr(self, 'model_metadata') else 0.53
             non_hit_mean = self.model_metadata.get('non_hit_mean_prob', 0.43) if hasattr(self, 'model_metadata') else 0.43
             
-            # Set dynamic raw bounds based on standard deviations around the means
-            # (Roughly ±2 stdev from the centers)
-            min_raw = non_hit_mean - 0.15
-            max_raw = hit_mean + 0.15
+            # Tighten the bounds significantly! 
+            # If a song reaches the hit_mean, it should score near 95%.
+            # If it is below non_hit_mean, it should score near 5%.
+            min_raw = non_hit_mean - 0.10
+            max_raw = hit_mean + 0.02
             
             min_scaled, max_scaled = 0.05, 0.95
             
