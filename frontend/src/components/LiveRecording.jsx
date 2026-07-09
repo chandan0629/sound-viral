@@ -14,11 +14,14 @@ export default function LiveRecording() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [progress, setProgress] = useState(0);
+  const [analyzingHooks, setAnalyzingHooks] = useState(false);
+  const [hookLoadingText, setHookLoadingText] = useState('');
 
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
   const reportRef = useRef(null);
+  const audioRef = useRef(null);
 
   const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5001');
 
@@ -29,9 +32,17 @@ export default function LiveRecording() {
   }, []);
 
   const formatTime = (seconds) => {
+    if (!seconds) return '0:00';
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const jumpToHook = (startTime) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = startTime;
+      audioRef.current.play().catch(e => console.log("Auto-play prevented", e));
+    }
   };
 
   const startRecording = async () => {
@@ -183,6 +194,61 @@ export default function LiveRecording() {
     }
   };
 
+  const handleAnalyzeHooks = async () => {
+    if (!audioBlob) return;
+    
+    setAnalyzingHooks(true);
+    setError(null);
+    
+    const loadingTexts = [
+      'Extracting spectral flux...',
+      'Computing beat synchronous features...',
+      'Detecting novelty curves...',
+      'Isolating chorus regions...',
+      'Calculating hook potential...',
+      'Finalizing temporal segments...'
+    ];
+    let idx = 0;
+    setHookLoadingText(loadingTexts[0]);
+    const interval = setInterval(() => {
+      idx = (idx + 1) % loadingTexts.length;
+      setHookLoadingText(loadingTexts[idx]);
+    }, 1500);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'live_recording.wav');
+
+      const response = await fetch(`${BACKEND_URL}/api/analyze-hooks`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      clearInterval(interval);
+      setAnalyzingHooks(false);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Hook analysis failed');
+      }
+      
+      const hookData = await response.json();
+      
+      setResult(prev => ({
+        ...prev,
+        temporalSegments: hookData.temporal_segments || [],
+        topHooks: hookData.top_hooks || [],
+        totalDurationSec: prev.features.duration_ms ? prev.features.duration_ms / 1000 : 0
+      }));
+      
+    } catch (err) {
+      clearInterval(interval);
+      setAnalyzingHooks(false);
+      setError(err.message || 'Failed to analyze hooks.');
+      console.error('Hook analysis error:', err);
+    }
+  };
+
   const handleDownloadReport = () => {
     if (!result || !reportRef.current) return;
     
@@ -321,6 +387,219 @@ export default function LiveRecording() {
                   <span className="confidence-text">{result.confidence}% confidence</span>
                 </div>
               </div>
+              {/* VIRAL HOOK DETECTION TRIGGER */}
+              {result.temporalSegments && result.temporalSegments.length === 0 && !analyzingHooks && (
+                <div style={{ margin: '30px 0 40px', textAlign: 'center' }}>
+                  <button 
+                    onClick={handleAnalyzeHooks}
+                    className="primary-button hook-button"
+                    style={{
+                      background: 'linear-gradient(135deg, #1DB954 0%, #1ed760 100%)',
+                      fontSize: '1.1rem',
+                      padding: '15px 30px',
+                      boxShadow: '0 8px 20px rgba(29, 185, 84, 0.4)'
+                    }}
+                  >
+                    🎯 Analyze Viral Hooks
+                  </button>
+                  <p style={{ marginTop: '10px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    Deep DSP analysis to find the best 15s TikTok segments (~10 seconds)
+                  </p>
+                </div>
+              )}
+              
+              {/* HOOK LOADING STATE */}
+              {analyzingHooks && (
+                <div className="hook-loading" style={{ margin: '40px 0', textAlign: 'center', padding: '30px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px' }}>
+                  <div className="hook-scanner-container" style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', position: 'relative', overflow: 'hidden', borderRadius: '2px', marginBottom: '20px' }}>
+                    <div className="hook-scanner" style={{
+                      position: 'absolute',
+                      top: 0, left: 0, height: '100%', width: '30%',
+                      background: 'var(--accent)',
+                      boxShadow: '0 0 10px var(--accent)',
+                      animation: 'scan 2s infinite ease-in-out alternate'
+                    }}></div>
+                  </div>
+                  <style>{`
+                    @keyframes scan {
+                      0% { left: -10%; }
+                      100% { left: 80%; }
+                    }
+                  `}</style>
+                  <h4 style={{ color: 'var(--accent)', marginBottom: '10px' }}>Analyzing Acoustic Structure</h4>
+                  <p style={{ color: 'var(--text-secondary)', animation: 'pulse 1.5s infinite' }}>{hookLoadingText}</p>
+                </div>
+              )}
+
+              {/* VIRAL HOOK DETECTION TRIGGER */}
+              {result.temporalSegments && result.temporalSegments.length === 0 && !analyzingHooks && (
+                <div style={{ margin: '30px 0 40px', textAlign: 'center' }}>
+                  <button 
+                    onClick={handleAnalyzeHooks}
+                    className="primary-button hook-button"
+                    style={{
+                      background: 'linear-gradient(135deg, #1DB954 0%, #1ed760 100%)',
+                      fontSize: '1.1rem',
+                      padding: '15px 30px',
+                      boxShadow: '0 8px 20px rgba(29, 185, 84, 0.4)'
+                    }}
+                  >
+                    🎯 Analyze Viral Hooks
+                  </button>
+                  <p style={{ marginTop: '10px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    Deep DSP analysis to find the best 15s TikTok segments (~10 seconds)
+                  </p>
+                </div>
+              )}
+              
+              {/* HOOK LOADING STATE */}
+              {analyzingHooks && (
+                <div className="hook-loading" style={{ margin: '40px 0', textAlign: 'center', padding: '30px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px' }}>
+                  <div className="hook-scanner-container" style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', position: 'relative', overflow: 'hidden', borderRadius: '2px', marginBottom: '20px' }}>
+                    <div className="hook-scanner" style={{
+                      position: 'absolute',
+                      top: 0, left: 0, height: '100%', width: '30%',
+                      background: 'var(--accent)',
+                      boxShadow: '0 0 10px var(--accent)',
+                      animation: 'scan 2s infinite ease-in-out alternate'
+                    }}></div>
+                  </div>
+                  <style>{`
+                    @keyframes scan {
+                      0% { left: -10%; }
+                      100% { left: 80%; }
+                    }
+                  `}</style>
+                  <h4 style={{ color: 'var(--accent)', marginBottom: '10px' }}>Analyzing Acoustic Structure</h4>
+                  <p style={{ color: 'var(--text-secondary)', animation: 'pulse 1.5s infinite' }}>{hookLoadingText}</p>
+                </div>
+              )}
+
+              {/* VIRAL HOOK DETECTION (HEATMAP) */}
+              {result.temporalSegments && result.temporalSegments.length > 0 && (
+                <div className="viral-hook-section" style={{ margin: '30px 0 40px', padding: '20px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px' }}>
+                  <h4 style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '1.2rem' }}>🔥</span> Viral Hook Detection (15s Segments)
+                  </h4>
+                  
+                  {(() => {
+                    const bestSegment = [...result.temporalSegments].sort((a, b) => b.hit_probability - a.hit_probability)[0];
+                    const formatTime = (secs) => {
+                      const m = Math.floor(secs / 60);
+                      const s = Math.floor(secs % 60);
+                      return `${m}:${s.toString().padStart(2, '0')}`;
+                    };
+                    
+                    return (
+                      <>
+                        <div className="top-hooks-list" style={{ marginBottom: '20px' }}>
+                          
+                          {/* Embedded Audio Player */}
+                          {audioUrl && (
+                            <div style={{ marginBottom: '20px', padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                              <h5 style={{ margin: '0 0 10px 0', color: 'var(--text-primary)' }}>Playback</h5>
+                              <audio 
+                                ref={audioRef} 
+                                src={audioUrl} 
+                                controls 
+                                style={{ width: '100%', height: '40px', outline: 'none' }}
+                              />
+                            </div>
+                          )}
+
+                          {result.topHooks && result.topHooks.map((hook, idx) => (
+                            <div 
+                              key={idx} 
+                              className="hook-callout" 
+                              onClick={() => jumpToHook(hook.start_time)}
+                              style={{ 
+                                background: idx === 0 ? 'linear-gradient(135deg, rgba(255,107,107,0.15) 0%, rgba(255,107,107,0.05) 100%)' : 'rgba(255,255,255,0.03)',
+                                border: `1px solid ${idx === 0 ? 'rgba(255,107,107,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                                padding: '12px 15px',
+                                borderRadius: '8px',
+                                marginBottom: '10px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
+                            >
+                              <div>
+                                <strong style={{ color: idx === 0 ? 'var(--accent)' : 'inherit', display: 'block', marginBottom: '4px' }}>
+                                  {idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : '🥉 '} {hook.type}
+                                </strong>
+                                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                                  {formatTime(hook.start_time)} - {formatTime(hook.end_time)} | {hook.description}
+                                </p>
+                              </div>
+                              <div style={{ textAlign: 'right' }}>
+                                <span style={{ display: 'block', fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--accent)' }}>
+                                  {(hook.hook_score * 100).toFixed(1)}
+                                </span>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                  Hook Score
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                          
+                          {/* Fallback for older API versions */}
+                          {(!result.topHooks || result.topHooks.length === 0) && (
+                            <div className="golden-hook-callout" style={{ 
+                              background: 'linear-gradient(135deg, rgba(255,107,107,0.1) 0%, rgba(255,107,107,0.05) 100%)',
+                              border: '1px solid rgba(255,107,107,0.3)',
+                              padding: '15px',
+                              borderRadius: '8px',
+                              marginBottom: '20px'
+                            }}>
+                              <strong style={{ color: 'var(--accent)', display: 'block', marginBottom: '5px' }}>Golden Hook Identified!</strong>
+                              <p style={{ margin: 0, fontSize: '0.9rem' }}>
+                                The most viral snippet is from <strong>{formatTime(bestSegment.start_time)} - {formatTime(bestSegment.end_time)}</strong> 
+                                &nbsp;({(bestSegment.hit_probability * 100).toFixed(1)}% Viral Potential). 
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="heatmap-container" style={{ position: 'relative', height: '40px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                          {result.temporalSegments.map((seg, i) => {
+                            const widthPct = ((seg.end_time - seg.start_time) / result.totalDurationSec) * 100;
+                            const leftPct = (seg.start_time / result.totalDurationSec) * 100;
+                            // Map probability to color: Greenish for high, Reddish for low
+                            const hue = seg.hit_probability > 0.5 ? 140 : 0;
+                            const saturation = Math.abs(seg.hit_probability - 0.5) * 200; // 0 to 100%
+                            const color = `hsl(${hue}, ${saturation}%, 50%)`;
+                            
+                            return (
+                              <div 
+                                key={i}
+                                className="heatmap-segment"
+                                title={`Time: ${formatTime(seg.start_time)}-${formatTime(seg.end_time)} | Hook Score: ${((seg.hook_score || seg.golden_candidate_score || seg.hit_probability || 0)*100).toFixed(1)}`}
+                                style={{
+                                  position: 'absolute',
+                                  left: `${leftPct}%`,
+                                  width: `${widthPct}%`,
+                                  height: '100%',
+                                  background: color,
+                                  opacity: 0.8,
+                                  borderRight: '1px solid rgba(255,255,255,0.1)'
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                        <div className="heatmap-labels" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '5px' }}>
+                          <span>0:00</span>
+                          <span>{formatTime(result.totalDurationSec)}</span>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
 
               <div className="result-features">
                 <h4>🎵 Core Audio Features (12)</h4>
