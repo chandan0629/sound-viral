@@ -595,15 +595,27 @@ class SongHitPredictor:
             return self._predict_xgboost(song_df)
 
     def _predict_xgboost(self, song_df):
-        """XGBoost prediction - COMPLETELY NEUTRAL"""
-        proba = self.model.predict_proba(song_df)[:, 1][0]
+        """XGBoost prediction - with dynamic scaling"""
+        raw_prob = self.model.predict_proba(song_df)[:, 1][0]
         
-        # STANDARD 50% threshold
+        # Use dynamic metadata bounds for scaling if available
+        hit_mean = self.model_metadata.get('hit_mean_prob', 0.53) if hasattr(self, 'model_metadata') else 0.53
+        non_hit_mean = self.model_metadata.get('non_hit_mean_prob', 0.43) if hasattr(self, 'model_metadata') else 0.43
+        
+        # Tighten the bounds significantly
+        min_raw = non_hit_mean - 0.10
+        max_raw = hit_mean + 0.02
+        
+        min_scaled, max_scaled = 0.05, 0.95
+        
+        scaled_prob = (raw_prob - min_raw) / (max_raw - min_raw) * (max_scaled - min_scaled) + min_scaled
+        scaled_prob = max(min_scaled, min(max_scaled, scaled_prob))
+        
         hit_threshold = 0.50
-        is_hit = proba > hit_threshold
-        confidence = min(abs(proba - hit_threshold) * 2, 1.0)
+        is_hit = scaled_prob >= hit_threshold
+        confidence = min(abs(scaled_prob - hit_threshold) * 2, 1.0)
 
-        return proba, confidence, is_hit
+        return scaled_prob, confidence, is_hit
 
     def _predict_lstm(self, song_df):
         """LSTM prediction - COMPLETELY NEUTRAL"""
