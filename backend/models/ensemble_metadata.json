@@ -1,12 +1,26 @@
 {
-  "model_type": "smote_balanced_ensemble",
-  "accuracy": 0.6255230914231856,
-  "auc": 0.7016079051057427,
-  "recall": 0.6845332278481012,
-  "precision": 0.29332994321552674,
-  "hit_mean_prob": 0.5370471281113223,
-  "non_hit_mean_prob": 0.4340800923375207,
-  "training_samples": 200382,
+  "model_type": "ensemble_xgb_rf_lr",
+  "accuracy": 0.6149293119698398,
+  "auc": 0.6925056746537966,
+  "recall": 0.6888229475766567,
+  "precision": 0.2872226346613874,
+  "f1": 0.4054022587029922,
+  "hit_mean_prob": 0.5365285457957565,
+  "non_hit_mean_prob": 0.4491372801336424,
+  "training_samples": 150307,
+  "test_samples": 26525,
+  "confusion_matrix": [
+    [
+      12829,
+      8641
+    ],
+    [
+      1573,
+      3482
+    ]
+  ],
+  "training_date": "2026-07-09T11:33:28.277061",
+  "total_training_time_seconds": 7.3888099193573,
   "features": [
     "danceability",
     "energy",
@@ -20,5 +34,25 @@
     "valence",
     "tempo",
     "duration_ms"
-  ]
+  ],
+  "individual_models": {
+    "xgboost": {
+      "accuracy": 0.6219415645617342,
+      "auc": 0.7039203830063065,
+      "precision": 0.29298143368578805,
+      "recall": 0.6961424332344214
+    },
+    "random_forest": {
+      "accuracy": 0.6115362865221489,
+      "auc": 0.6895376199486136,
+      "precision": 0.2838672486206045,
+      "recall": 0.6818991097922849
+    },
+    "logistic_regression": {
+      "accuracy": 0.5582657869934025,
+      "auc": 0.6289420980301914,
+      "precision": 0.24943583571536032,
+      "recall": 0.6559841740850643
+    }
+  }
 }

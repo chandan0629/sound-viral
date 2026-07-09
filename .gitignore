@@ -60,6 +60,8 @@ frontend/dist/
 frontend_login_page/frontend/dist/
 *.h5
 *.pkl
+# BUT allow backend model files to be tracked
+!backend/models/*.pkl
 
 # Vercel
 .vercel

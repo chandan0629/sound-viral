@@ -177,6 +177,16 @@ class SongHitPredictor:
                 if os.path.exists(metadata_path):
                     with open(metadata_path, 'r') as f:
                         self.model_metadata = json.load(f)
+                # Also load ensemble_metadata.json for hit_mean_prob/non_hit_mean_prob
+                ensemble_metadata_path = os.path.join(self.model_dir, "ensemble_metadata.json")
+                if os.path.exists(ensemble_metadata_path):
+                    with open(ensemble_metadata_path, 'r') as f:
+                        ens_meta = json.load(f)
+                    for key in ('hit_mean_prob', 'non_hit_mean_prob'):
+                        if key in ens_meta and key not in self.model_metadata:
+                            self.model_metadata[key] = ens_meta[key]
+                    logger.info(f"✓ Loaded ensemble metadata: hit_mean={self.model_metadata.get('hit_mean_prob')}, non_hit_mean={self.model_metadata.get('non_hit_mean_prob')}")
+                logger.info("✓ Standalone XGBoost model loaded (ensemble files missing)")
                 return True
             
             if model_type == "lstm":
@@ -545,7 +555,7 @@ class SongHitPredictor:
             return None
     
     def _predict_ensemble(self, song_df):
-        """Ensemble prediction with probability scaling for realistic hit scores"""
+        """Ensemble prediction with realistic probability scaling"""
         try:
             # Get predictions from all three models
             xgb_proba = self.xgb_model.predict_proba(song_df)[:, 1][0]
@@ -561,17 +571,10 @@ class SongHitPredictor:
             
             # Equal weight average (raw probability)
             raw_prob = (xgb_proba + rf_proba + lr_proba) / 3
+            logger.info(f"[ENSEMBLE] Raw probabilities: XGB={xgb_proba:.4f}, RF={rf_proba:.4f}, LR={lr_proba:.4f}, AVG={raw_prob:.4f}")
             
-            # Use dynamic metadata bounds for scaling if available
-            hit_mean = self.model_metadata.get('hit_mean_prob', 0.53) if hasattr(self, 'model_metadata') else 0.53
-            non_hit_mean = self.model_metadata.get('non_hit_mean_prob', 0.43) if hasattr(self, 'model_metadata') else 0.43
-            
-            # Tighten the bounds significantly! 
-            # If a song reaches the hit_mean, it should score near 95%.
-            # If it is below non_hit_mean, it should score near 5%.
-            min_raw = non_hit_mean - 0.10
-            max_raw = hit_mean + 0.02
-            
+            # Realistic scaling: map [0.30, 0.60] → [5%, 95%]
+            min_raw, max_raw = 0.30, 0.60
             min_scaled, max_scaled = 0.05, 0.95
             
             scaled_prob = (raw_prob - min_raw) / (max_raw - min_raw) * (max_scaled - min_scaled) + min_scaled
@@ -587,6 +590,7 @@ class SongHitPredictor:
             confidence = abs(scaled_prob - hit_threshold) * 2 * agreement
             confidence = min(max(confidence, 0.1), 1.0)
             
+            logger.info(f"[ENSEMBLE] Scaled={scaled_prob:.4f}, Confidence={confidence:.4f}, IsHit={is_hit}")
             return scaled_prob, confidence, is_hit
         except Exception as e:
             logger.error(f"Ensemble prediction error: {e}")
@@ -595,17 +599,16 @@ class SongHitPredictor:
             return self._predict_xgboost(song_df)
 
     def _predict_xgboost(self, song_df):
-        """XGBoost prediction - with dynamic scaling"""
+        """XGBoost prediction with realistic scaling"""
         raw_prob = self.model.predict_proba(song_df)[:, 1][0]
+        logger.info(f"[XGBOOST] Raw probability: {raw_prob:.6f}")
         
-        # Use dynamic metadata bounds for scaling if available
-        hit_mean = self.model_metadata.get('hit_mean_prob', 0.53) if hasattr(self, 'model_metadata') else 0.53
-        non_hit_mean = self.model_metadata.get('non_hit_mean_prob', 0.43) if hasattr(self, 'model_metadata') else 0.43
-        
-        # Tighten the bounds significantly
-        min_raw = non_hit_mean - 0.10
-        max_raw = hit_mean + 0.02
-        
+        # Realistic scaling: map [0.30, 0.60] → [5%, 95%]
+        # Based on empirical XGBoost output distribution:
+        #   Amateur recordings: ~0.02-0.15 (clear non-hit)
+        #   Borderline songs:   ~0.35-0.45 (could go either way)
+        #   Clear hits:         ~0.55-0.70 (strong hit signal)
+        min_raw, max_raw = 0.30, 0.60
         min_scaled, max_scaled = 0.05, 0.95
         
         scaled_prob = (raw_prob - min_raw) / (max_raw - min_raw) * (max_scaled - min_scaled) + min_scaled
@@ -614,7 +617,8 @@ class SongHitPredictor:
         hit_threshold = 0.50
         is_hit = scaled_prob >= hit_threshold
         confidence = min(abs(scaled_prob - hit_threshold) * 2, 1.0)
-
+        
+        logger.info(f"[XGBOOST] Scaled={scaled_prob:.4f}, Confidence={confidence:.4f}, IsHit={is_hit}")
         return scaled_prob, confidence, is_hit
 
     def _predict_lstm(self, song_df):
