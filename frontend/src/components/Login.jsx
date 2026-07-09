@@ -11,7 +11,86 @@ export default function Login({ onLogin, onSwitchToSignup, onSwitchToForgot, isD
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Google Identity Services has been removed per user request
+  // Helper to decode JWT token on client-side
+  const decodeJwt = (token) => {
+    try {
+      const base64Url = token.split('.')[1]
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+      const jsonPayload = decodeURIComponent(
+        window
+          .atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+      return JSON.parse(jsonPayload)
+    } catch (e) {
+      console.error('Error decoding Google Identity JWT:', e)
+      return null
+    }
+  }
+
+  const handleGoogleResponse = async (response) => {
+    try {
+      setLoading(true)
+      setError('')
+      const res = await fetch(`${BACKEND_URL}/api/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      })
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'Google login failed')
+      }
+      const userData = await res.json()
+      localStorage.setItem('sv_user', JSON.stringify(userData))
+      if (onLogin) {
+        onLogin(userData)
+      }
+    } catch (err) {
+      console.error('Google Sign-In failed:', err)
+      setError(err.message || 'Google Sign-In failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Initialize and render Google Identity Services button
+  useEffect(() => {
+    const initGoogle = () => {
+      if (typeof window !== 'undefined' && typeof window.google !== 'undefined' && window.google.accounts) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: '932079735532-ovm5u0rrsgdp0mtpr8mlf2oo0njo4n3h.apps.googleusercontent.com',
+            callback: handleGoogleResponse
+          })
+          const btn = document.getElementById('google-signin-button')
+          if (btn) {
+            window.google.accounts.id.renderButton(btn, {
+              theme: isDarkMode ? 'filled_black' : 'outline',
+              size: 'large',
+              width: btn.offsetWidth || 340,
+              text: 'signin_with'
+            })
+          }
+          return true
+        } catch (e) {
+          console.error('Error rendering Google button:', e)
+        }
+      }
+      return false
+    }
+
+    if (!initGoogle()) {
+      const interval = setInterval(() => {
+        if (initGoogle()) {
+          clearInterval(interval)
+        }
+      }, 500)
+      return () => clearInterval(interval)
+    }
+  }, [isDarkMode])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -157,7 +236,13 @@ export default function Login({ onLogin, onSwitchToSignup, onSwitchToForgot, isD
             </button>
           </form>
           
+          <div className="auth-divider">
+            <span>or</span>
+          </div>
 
+          <div className="google-auth-container">
+            <div id="google-signin-button"></div>
+          </div>
           
           <div className="auth-footer">
             <p>
