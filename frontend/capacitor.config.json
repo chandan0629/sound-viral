@@ -1,5 +1,8 @@
 {
   "appId": "com.chandan.soundviral",
   "appName": "SoundViral",
-  "webDir": "dist"
+  "webDir": "dist",
+  "server": {
+    "cleartext": true
+  }
 }
