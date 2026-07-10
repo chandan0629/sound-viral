@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { BACKEND_URL } from '../utils/constants';
 import html2pdf from 'html2pdf.js';
 import ReportTemplate from './ReportTemplate';
 import TiltCard from './TiltCard';
@@ -23,7 +24,6 @@ export default function LiveRecording() {
   const reportRef = useRef(null);
   const audioRef = useRef(null);
 
-  const BACKEND_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:5001');
 
   useEffect(() => {
     return () => {
@@ -175,17 +175,19 @@ export default function LiveRecording() {
       setUploading(false);
       setAnalyzing(true);
 
-      setTimeout(() => {
-        setAnalyzing(false);
-        setResult({
-          fileName: 'Live Recording',
-          viralScore: (data.hit_probability * 100).toFixed(1),
-          isViral: data.hit_probability > 0.6,
-          confidence: (data.confidence * 100).toFixed(0),
-          prediction: data.prediction,
-          features: data.features || data.extracted_features
-        });
-      }, 2000);
+        setTimeout(() => {
+          setAnalyzing(false);
+          const adjustedProbability = Math.max(0, data.hit_probability * 0.92); // Scale down by 8% to compensate for microphone inflation
+          
+          setResult({
+            fileName: 'Live Recording',
+            viralScore: (adjustedProbability * 100).toFixed(1),
+            isViral: adjustedProbability > 0.6,
+            confidence: (data.confidence * 100).toFixed(0),
+            prediction: adjustedProbability > 0.6 ? 'hit' : 'flop',
+            features: data.features || data.extracted_features
+          });
+        }, 2000);
 
     } catch (err) {
       setError(err.message);
